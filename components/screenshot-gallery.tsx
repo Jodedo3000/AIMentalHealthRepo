@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight, Maximize2, FlaskConical } from 'lucide-react';
 import type { Media } from '@/lib/types';
 
@@ -38,6 +39,8 @@ export function ScreenshotGallery({ media, entityName }: { media: Media[]; entit
   const [hero, setHero] = useState(0);
   const [fsOpen, setFsOpen] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const open = fsOpen || lightbox !== null;
@@ -121,8 +124,8 @@ export function ScreenshotGallery({ media, entityName }: { media: Media[]; entit
         </div>
       </div>
 
-      {/* ---------- fullscreen gallery ---------- */}
-      {fsOpen && (
+      {/* ---------- fullscreen gallery (portaled to body to escape sticky stacking context) ---------- */}
+      {mounted && fsOpen && createPortal(
         <div className="fixed inset-0 z-[100] bg-[#F9FAFB] overflow-y-auto overflow-x-hidden" style={{ scrollBehavior: 'smooth' }}>
           <div className="sticky top-0 z-10 bg-white/85 backdrop-blur border-b border-[#E5E7EB]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
@@ -166,11 +169,12 @@ export function ScreenshotGallery({ media, entityName }: { media: Media[]; entit
               </section>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ---------- lightbox (light, per design rules) ---------- */}
-      {lightbox !== null && (
+      {mounted && lightbox !== null && createPortal(
         <div className="fixed inset-0 z-[110] bg-white/95 backdrop-blur-md flex flex-col" onClick={() => setLightbox(null)}>
           <div className="h-14 flex items-center justify-between px-4 sm:px-6 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
             <span className="text-sm text-[#6B7280]">
@@ -200,7 +204,8 @@ export function ScreenshotGallery({ media, entityName }: { media: Media[]; entit
               <p className="text-sm text-[#6B7280] max-w-lg mx-auto">{items[lightbox].caption}</p>
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

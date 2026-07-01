@@ -1,7 +1,9 @@
 export type EntityType = 'App' | 'Research' | 'VC' | 'App/Research';
 export type EntityFocus = 'Clinical' | 'Wellness' | 'Both';
 export type EvidenceType = 'RCT' | 'Pilot' | 'Peer-reviewed' | 'Anecdotal' | 'Meta-analysis' | 'Observational';
-export type MediaCategory = 'Onboarding' | 'AI-Interaction' | 'Dashboard' | 'General';
+// Free-text "part of the app" section label (e.g. "AI Chat with Fy", "Onboarding").
+export type MediaCategory = string;
+export const MEDIA_CATEGORY_SUGGESTIONS = ['Onboarding', 'AI-Interaction', 'Dashboard', 'General'];
 export type TagType = 'condition' | 'framework' | 'general';
 export type AgeGroup = 'Adults' | 'Children & Adolescents' | 'All ages';
 

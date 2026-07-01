@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Sparkles, Calendar, FlaskConical, ChevronLeft, ChevronRight, Bot } from 'lucide-react';
 import { Navigation } from '@/components/navigation';
 import { EvidenceBadge } from '@/components/evidence-badge';
+import { ScreenshotGallery } from '@/components/screenshot-gallery';
 import { getEntityById } from '@/lib/queries';
 import type { EntityWithRelations } from '@/lib/types';
 
@@ -60,20 +61,9 @@ const focusColors: Record<string, string> = {
   Both: 'bg-teal-50 text-teal-700 border-teal-200',
 };
 
-function PhoneFrame({ src, alt }: { src: string; alt: string }) {
-  return (
-    <div className="phone-frame w-[180px] flex-shrink-0 aspect-[9/19]">
-      <div className="pt-4 w-full h-full overflow-hidden">
-        <img src={src} alt={alt} className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/6801648/pexels-photo-6801648.jpeg?auto=compress&cs=tinysrgb&w=400'; }} />
-      </div>
-    </div>
-  );
-}
-
 export default function EntityDetailPage({ params }: { params: { id: string } }) {
   const [entity, setEntity] = useState<EntityWithRelations | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeMedia, setActiveMedia] = useState(0);
 
   useEffect(() => {
     getEntityById(params.id)
@@ -256,58 +246,7 @@ export default function EntityDetailPage({ params }: { params: { id: string } })
           </div>
 
           <div className="lg:sticky lg:top-24 space-y-6">
-            {hasMedia ? (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider">
-                    Screenshots ({entity.media.length})
-                  </h2>
-                  {entity.media.length > 1 && (
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setActiveMedia((p) => (p - 1 + entity.media.length) % entity.media.length)}
-                        className="w-6 h-6 rounded-full border border-[#E5E7EB] bg-white flex items-center justify-center hover:border-[#A3B18A] transition-colors"
-                      >
-                        <ChevronLeft size={12} />
-                      </button>
-                      <span className="text-xs text-[#9CA3AF]">{activeMedia + 1}/{entity.media.length}</span>
-                      <button
-                        onClick={() => setActiveMedia((p) => (p + 1) % entity.media.length)}
-                        className="w-6 h-6 rounded-full border border-[#E5E7EB] bg-white flex items-center justify-center hover:border-[#A3B18A] transition-colors"
-                      >
-                        <ChevronRight size={12} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-                  {entity.media.map((m, i) => (
-                    <button key={m.id} onClick={() => setActiveMedia(i)} className={`flex-shrink-0 transition-all ${i === activeMedia ? 'opacity-100' : 'opacity-60 hover:opacity-80'}`}>
-                      <PhoneFrame src={m.image_url} alt={m.caption || entity.name} />
-                    </button>
-                  ))}
-                </div>
-
-                {entity.media[activeMedia] && (
-                  <div className="mt-3 space-y-1">
-                    {entity.media[activeMedia].caption && (
-                      <p className="text-xs text-[#6B7280]">{entity.media[activeMedia].caption}</p>
-                    )}
-                    <span className="tag-pill bg-[#F3F4F6] text-[#9CA3AF] border-[#E5E7EB] text-[10px]">
-                      {entity.media[activeMedia].category}
-                    </span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 text-center">
-                <div className="w-12 h-12 rounded-xl bg-[#F3F4F6] flex items-center justify-center mx-auto mb-3">
-                  <FlaskConical size={20} className="text-[#9CA3AF]" />
-                </div>
-                <p className="text-sm text-[#9CA3AF]">No screenshots available</p>
-              </div>
-            )}
+            <ScreenshotGallery media={entity.media} entityName={entity.name} />
 
             <div className="bg-white rounded-xl border border-[#E5E7EB] p-5 space-y-4">
               <h2 className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider">Quick Facts</h2>

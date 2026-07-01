@@ -35,3 +35,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 seed/
+
+# Local original screenshots (compressed webp live in Supabase Storage)
+Screenshots/
+
+.claude/settings.local.json

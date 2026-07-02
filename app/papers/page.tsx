@@ -17,8 +17,14 @@ export default function PapersPage() {
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([]);
   const [selectedEvidenceTypes, setSelectedEvidenceTypes] = useState<string[]>([]);
+  const [selectedYears, setSelectedYears] = useState<string[]>([]);
   const [openAccessOnly, setOpenAccessOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+
+  const years = useMemo(
+    () => Array.from(new Set(papers.map((p) => p.year).filter(Boolean) as number[])).sort((a, b) => b - a).map(String),
+    [papers]
+  );
 
   useEffect(() => {
     getPapers().then(setPapers).finally(() => setLoading(false));
@@ -27,12 +33,13 @@ export default function PapersPage() {
   const toggle = (arr: string[], val: string, set: (v: string[]) => void) =>
     set(arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val]);
 
-  const activeFilterCount = selectedConditions.length + selectedFrameworks.length + selectedEvidenceTypes.length + (openAccessOnly ? 1 : 0);
+  const activeFilterCount = selectedConditions.length + selectedFrameworks.length + selectedEvidenceTypes.length + selectedYears.length + (openAccessOnly ? 1 : 0);
 
   const clearFilters = () => {
     setSelectedConditions([]);
     setSelectedFrameworks([]);
     setSelectedEvidenceTypes([]);
+    setSelectedYears([]);
     setOpenAccessOnly(false);
   };
 
@@ -42,6 +49,7 @@ export default function PapersPage() {
       if (selectedConditions.length && !selectedConditions.some((c) => p.conditions.includes(c))) return false;
       if (selectedFrameworks.length && !selectedFrameworks.some((f) => p.frameworks.includes(f))) return false;
       if (selectedEvidenceTypes.length && !selectedEvidenceTypes.includes(p.evidence_type)) return false;
+      if (selectedYears.length && !(p.year && selectedYears.includes(String(p.year)))) return false;
 
       if (search.trim()) {
         const q = search.toLowerCase();
@@ -57,7 +65,7 @@ export default function PapersPage() {
 
       return true;
     });
-  }, [papers, search, selectedConditions, selectedFrameworks, selectedEvidenceTypes, openAccessOnly]);
+  }, [papers, search, selectedConditions, selectedFrameworks, selectedEvidenceTypes, selectedYears, openAccessOnly]);
 
   const FilterSection = ({ label, items, selected, onToggle, color }: {
     label: string;
@@ -204,6 +212,15 @@ export default function PapersPage() {
               onToggle={(v) => toggle(selectedEvidenceTypes, v, setSelectedEvidenceTypes)}
               color="bg-emerald-600 text-white border-emerald-600"
             />
+            {years.length > 0 && (
+              <FilterSection
+                label="Year of publication"
+                items={years}
+                selected={selectedYears}
+                onToggle={(v) => toggle(selectedYears, v, setSelectedYears)}
+                color="bg-indigo-600 text-white border-indigo-600"
+              />
+            )}
           </div>
         )}
 

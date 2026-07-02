@@ -20,6 +20,7 @@ const USE_CASE_COLORS: Record<string, string> = {
 
 export function PromptCard({ prompt }: PromptCardProps) {
   const [copied, setCopied] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(prompt.prompt_text);
@@ -89,9 +90,17 @@ export function PromptCard({ prompt }: PromptCardProps) {
             )}
           </button>
         </div>
-        <p className="px-3 py-3 text-xs text-[#374151] leading-relaxed font-mono whitespace-pre-wrap line-clamp-6">
+        <p className={`px-3 py-3 text-xs text-[#374151] leading-relaxed font-mono whitespace-pre-wrap ${expanded ? '' : 'line-clamp-6'}`}>
           {prompt.prompt_text}
         </p>
+        {prompt.prompt_text.length > 300 && (
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            className="w-full text-[10px] font-semibold text-[#3A5A40] hover:bg-white py-1.5 border-t border-[#E9ECEF] transition-colors"
+          >
+            {expanded ? 'Show less' : 'Show full prompt'}
+          </button>
+        )}
       </div>
 
       {prompt.tags.length > 0 && (
